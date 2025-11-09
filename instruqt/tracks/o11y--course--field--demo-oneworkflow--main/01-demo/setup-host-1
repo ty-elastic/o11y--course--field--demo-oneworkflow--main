@@ -21,8 +21,10 @@ git checkout 2.1.5
 kubectl create namespace "opentelemetry-demo"
 helm upgrade --namespace "opentelemetry-demo" --install "my-otel-demo" "open-telemetry/opentelemetry-demo" --version 0.38.3 -f kubernetes/elastic-helm/demo.yml
 
-
 # ------------- ONE WORKFLOW
+
+docker pull us-central1-docker.pkg.dev/elastic-sa/tbekiares-demo/tbekiares-demo-aiassistantv2
+docker run -d -p 9013:8080 us-central1-docker.pkg.dev/elastic-sa/tbekiares-demo/tbekiares-demo-aiassistantv2
 
 echo "Initializing OneWorkflow"
 init_one_workflow() {
@@ -44,6 +46,6 @@ init_one_workflow() {
 retry_command_lin init_one_workflow
 
 docker pull $REPO/workflows:$INSTRUQT_TRACK_SLUG
-docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
+docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_proxy http://host-1:9013 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
 
 docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_alerts
