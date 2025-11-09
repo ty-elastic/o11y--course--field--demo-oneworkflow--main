@@ -18,4 +18,5 @@ git clone https://github.com/elastic/opentelemetry-demo.git
 cd opentelemetry-demo
 git checkout 2.1.5
 
+kubectl create namespace "opentelemetry-demo"
 helm upgrade --namespace "opentelemetry-demo" --install "my-otel-demo" "open-telemetry/opentelemetry-demo" --version 0.38.3 -f kubernetes/elastic-helm/demo.yml
