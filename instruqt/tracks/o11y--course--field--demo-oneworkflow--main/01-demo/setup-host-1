@@ -45,13 +45,24 @@ init_one_workflow() {
 }
 retry_command_lin init_one_workflow
 
-connectors=$(curl -X GET -s "$KIBANA_URL/api/actions/connectors" \
-    -H "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
-    -H "Content-Type: application/json" \
-    -H "kbn-xsrf: true" \
-    -H 'x-elastic-internal-origin: Kibana')
+get_ai_connector() {
+    connectors=$(curl -X GET -s "$KIBANA_URL/api/actions/connectors" \
+        -H "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+        -H "Content-Type: application/json" \
+        -H "kbn-xsrf: true" \
+        -H 'x-elastic-internal-origin: Kibana')
 
-CONNECTOR_ID=$(echo "$connectors" | jq -r '.[0].id')
+    CONNECTOR_ID=$(echo "$connectors" | jq -r '.[0].id')
+
+    if [[ -n "$CONNECTOR_ID" ]]; then
+        echo "get_ai_connector successfully initialized: $CONNECTOR_ID"
+        return 0
+    else
+        echo "Failed to initialize get_ai_connector. $connectors"
+        return 1
+    fi
+}
+retry_command_lin get_ai_connector
 
 docker pull $REPO/workflows:$INSTRUQT_TRACK_SLUG
 docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_connector $CONNECTOR_ID --ai_proxy http://host-1:9013 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
