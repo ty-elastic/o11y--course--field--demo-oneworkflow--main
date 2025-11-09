@@ -24,7 +24,7 @@ helm upgrade --namespace "opentelemetry-demo" --install "my-otel-demo" "open-tel
 # ------------- ONE WORKFLOW
 
 docker pull us-central1-docker.pkg.dev/elastic-sa/tbekiares-demo/tbekiares-demo-aiassistantv2
-docker run -d -p 9013:8080 us-central1-docker.pkg.dev/elastic-sa/tbekiares-demo/tbekiares-demo-aiassistantv2
+docker run -d -p 9013:8080 us-central1-docker.pkg.dev/elastic-sa/tbekiares/aiassistant:o11y--course--field--demo-oneworkflow--main
 
 echo "Initializing OneWorkflow"
 init_one_workflow() {
@@ -45,7 +45,15 @@ init_one_workflow() {
 }
 retry_command_lin init_one_workflow
 
+connectors=$(curl -X GET -s "$KIBANA_URL/api/actions/connectors" \
+    -H "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+    -H "Content-Type: application/json" \
+    -H "kbn-xsrf: true" \
+    -H 'x-elastic-internal-origin: Kibana')
+
+CONNECTOR_ID=$(echo "$connectors" | jq -r '.[0].id')
+
 docker pull $REPO/workflows:$INSTRUQT_TRACK_SLUG
-docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_proxy http://host-1:9013 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
+docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_connector $CONNECTOR_ID --ai_proxy http://host-1:9013 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
 
 docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_alerts
