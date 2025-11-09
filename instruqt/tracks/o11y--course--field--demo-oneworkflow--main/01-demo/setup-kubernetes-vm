@@ -4,7 +4,11 @@ export $(curl http://kubernetes-vm:9000/env | xargs)
 export INSTRUQT_TRACK_SLUG=o11y--course--field--demo-oneworkflow--main
 export REPO=us-central1-docker.pkg.dev/elastic-sa/tbekiares
 
-/opt/workshops/clone-code.sh -r ty-elastic/instruqt_$INSTRUQT_TRACK_SLUG -d false
+# ------------- CODE
+
+mkdir -p /workspace/workshop
+git clone ty-elastic/instruqt_$INSTRUQT_TRACK_SLUG /workspace/workshop
+cd /workspace/workshop
 
 # ------------- VIEW
 
