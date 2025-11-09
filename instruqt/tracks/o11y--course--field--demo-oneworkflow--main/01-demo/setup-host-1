@@ -46,4 +46,4 @@ retry_command_lin init_one_workflow
 docker pull $REPO/workflows:$INSTRUQT_TRACK_SLUG
 docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
 
-
+docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_alerts
