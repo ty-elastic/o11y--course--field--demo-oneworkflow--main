@@ -1,19 +1,8 @@
 source /opt/workshops/elastic-retry.sh
 export $(curl http://kubernetes-vm:9000/env | xargs)
 
-export INSTRUQT_TRACK_SLUG=o11y--course--field--200-otel-logs--main
-export GITHUB_REPO=https://github.com/ty-elastic/instruqt_$INSTRUQT_TRACK_SLUG
-
-# ------------- FIX Kibana
-
-# kubectl rollout restart deployment/kibana-kb
-# retry_command_lin check_es_health
-
-# ------------- CODE
-
-mkdir -p /workspace/workshop
-git clone $GITHUB_REPO /workspace/workshop
-cd /workspace/workshop
+export INSTRUQT_TRACK_SLUG=o11y--course--field--demo-oneworkflow--main
+export REPO=us-central1-docker.pkg.dev/elastic-sa/tbekiares
 
 # ------------- VIEW
 
@@ -22,4 +11,3 @@ source /workspace/workshop/instruqt/scripts/elastic-view.sh
 # ------------- AI ASSISTANT
 
 source /workspace/workshop/instruqt/scripts/elastic-completion.sh
-
