@@ -58,5 +58,5 @@ kubectl create secret generic elastic-secret-otel \
 
 helm upgrade --install opentelemetry-kube-stack open-telemetry/opentelemetry-kube-stack \
   --namespace $namespace \
-  --values 'https://raw.githubusercontent.com/elastic/elastic-agent/refs/tags/v9.2.0/deploy/helm/edot-collector/kube-stack/values.yaml' \
+  --values '/workspace/workshop/collector/values.yaml' \
   --version '0.10.5'

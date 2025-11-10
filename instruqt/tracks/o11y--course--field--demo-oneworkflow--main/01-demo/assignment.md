@@ -2,7 +2,7 @@
 slug: demo
 id: zzp0nxfxmxry
 type: challenge
-title: Getting Started
+title: Demo
 tabs:
 - id: xdbcqb6naygo
   title: Elasticsearch
