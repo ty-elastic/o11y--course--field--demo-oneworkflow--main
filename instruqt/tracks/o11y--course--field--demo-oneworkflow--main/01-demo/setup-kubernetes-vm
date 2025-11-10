@@ -18,3 +18,53 @@ source /workspace/workshop/instruqt/scripts/elastic-view.sh
 # ------------- AI ASSISTANT
 
 source /workspace/workshop/instruqt/scripts/elastic-completion.sh
+
+# ------------- ONE WORKFLOW
+
+apt-get update & apt install docker -y
+
+docker pull us-central1-docker.pkg.dev/elastic-sa/tbekiares/aiassistant:o11y--course--field--demo-oneworkflow--main
+docker run -d -p 9013:8080 us-central1-docker.pkg.dev/elastic-sa/tbekiares/aiassistant:o11y--course--field--demo-oneworkflow--main
+
+echo "Initializing OneWorkflow"
+init_one_workflow() {
+    local http_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$KIBANA_URL/internal/kibana/settings" \
+    --header 'Content-Type: application/json' \
+    --header "kbn-xsrf: true" \
+    --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+    --header 'x-elastic-internal-origin: Kibana' \
+    -d '{"changes":{"workflows:ui:enabled":true}}')
+
+    if echo $http_status | grep -q '^2'; then
+        echo "OneWorkflow successfully initialized: $http_status"
+        return 0
+    else
+        echo "Failed to initialize OneWorkflow. HTTP status: $http_status"
+        return 1
+    fi
+}
+retry_command_lin init_one_workflow
+
+get_ai_connector() {
+    connectors=$(curl -X GET -s "$KIBANA_URL/api/actions/connectors" \
+        -H "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+        -H "Content-Type: application/json" \
+        -H "kbn-xsrf: true" \
+        -H 'x-elastic-internal-origin: Kibana')
+
+    CONNECTOR_ID=$(echo "$connectors" | jq -r '.[0].id // ""')
+
+    if [[ -n "$CONNECTOR_ID" ]]; then
+        echo "get_ai_connector successfully initialized: $CONNECTOR_ID"
+        return 0
+    else
+        echo "Failed to initialize get_ai_connector. $connectors"
+        return 1
+    fi
+}
+retry_command_lin get_ai_connector
+
+docker pull $REPO/workflows:$INSTRUQT_TRACK_SLUG
+docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_connector $CONNECTOR_ID --ai_proxy http://host-1:9013 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
+
+docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_alerts

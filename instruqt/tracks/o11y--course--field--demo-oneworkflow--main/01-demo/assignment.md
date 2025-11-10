@@ -8,29 +8,26 @@ tabs:
   title: Elasticsearch
   type: service
   hostname: kubernetes-vm
-  path: /app/discover#/?_g=(filters:!(),query:(language:kuery,query:''),refreshInterval:(pause:!t,value:60000),time:(from:now-1h,to:now))&_a=(breakdownField:log.level,columns:!(),dataSource:(type:esql),filters:!(),hideChart:!f,interval:auto,query:(esql:'FROM%20logs-*'),sort:!(!('@timestamp',desc)))
+  path: /app/apm/service-map
   port: 30001
-
-- id: flags
+- id: 5zbvgruqoy8x
   title: Flags
   type: service
   hostname: host-1
   path: /feature
   port: 8080
-
-- id: store
-  title: Flags
+- id: 3o6dqpvmx3sb
+  title: Store
   type: service
   hostname: host-1
   path: /
   port: 8080
-
 - id: ssyhxjku2bhz
   title: host-1
   type: terminal
   hostname: host-1
   workdir: /workspace/workshop
-- id: blah
+- id: swrcs8e6rna6
   title: kubernetes-vm
   type: terminal
   hostname: kubernetes-vm
