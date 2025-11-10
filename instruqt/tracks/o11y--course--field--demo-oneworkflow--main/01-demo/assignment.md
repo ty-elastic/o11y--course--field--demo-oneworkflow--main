@@ -33,7 +33,7 @@ tabs:
   hostname: kubernetes-vm
   workdir: /workspace/workshop
 difficulty: basic
-timelimit: 600
+timelimit: 43200
 enhanced_loading: null
 ---
 Demo

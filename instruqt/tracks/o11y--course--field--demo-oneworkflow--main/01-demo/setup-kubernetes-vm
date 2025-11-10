@@ -24,7 +24,7 @@ source /workspace/workshop/instruqt/scripts/elastic-completion.sh
 sudo apt-get update
 sudo apt-get -y install podman
 
-podman run --network host -d -p 9013:8080 us-central1-docker.pkg.dev/elastic-sa/tbekiares/aiassistant:o11y--course--field--demo-oneworkflow--main
+podman run --network host -d us-central1-docker.pkg.dev/elastic-sa/tbekiares/aiassistant:o11y--course--field--demo-oneworkflow--main
 
 echo "Initializing OneWorkflow"
 init_one_workflow() {
@@ -64,6 +64,6 @@ get_ai_connector() {
 }
 retry_command_lin get_ai_connector
 
-podman run --network host $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_connector $CONNECTOR_ID --ai_proxy http://kubernetes-vm:9013 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
+podman run --network host $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_connector $CONNECTOR_ID --ai_proxy http://kubernetes-vm:8080 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
 
 podman run --network host $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_alerts
