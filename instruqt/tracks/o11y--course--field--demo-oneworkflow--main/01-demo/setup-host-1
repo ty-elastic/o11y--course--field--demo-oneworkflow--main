@@ -52,7 +52,7 @@ get_ai_connector() {
         -H "kbn-xsrf: true" \
         -H 'x-elastic-internal-origin: Kibana')
 
-    CONNECTOR_ID=$(echo "$connectors" | jq -r '.[0].id')
+    CONNECTOR_ID=$(echo "$connectors" | jq -r '.[0].id // ""')
 
     if [[ -n "$CONNECTOR_ID" ]]; then
         echo "get_ai_connector successfully initialized: $CONNECTOR_ID"
@@ -68,3 +68,23 @@ docker pull $REPO/workflows:$INSTRUQT_TRACK_SLUG
 docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_connector $CONNECTOR_ID --ai_proxy http://host-1:9013 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
 
 docker run $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_alerts
+
+# ------------- Load Balancer frontend-proxy
+
+echo '
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-proxy-lb
+  namespace: opentelemetry-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: frontend-proxy
+  type: LoadBalancer' > /workspace/frontendproxy-lb.yaml
+
+kubectl apply -f /workspace/frontendproxy-lb.yaml
