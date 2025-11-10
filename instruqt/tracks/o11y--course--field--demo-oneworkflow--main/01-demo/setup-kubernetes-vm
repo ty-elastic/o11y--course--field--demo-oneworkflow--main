@@ -19,12 +19,12 @@ source /workspace/workshop/instruqt/scripts/elastic-view.sh
 
 source /workspace/workshop/instruqt/scripts/elastic-completion.sh
 
-# ------------- ONE WORKFLOW
+# ------------- PODMAN
 
 sudo apt-get update
 sudo apt-get -y install podman
 
-podman run --network host -d us-central1-docker.pkg.dev/elastic-sa/tbekiares/aiassistant:o11y--course--field--demo-oneworkflow--main
+# ------------- ENABLE ONE WORKFLOW
 
 echo "Initializing OneWorkflow"
 init_one_workflow() {
@@ -45,6 +45,12 @@ init_one_workflow() {
 }
 retry_command_lin init_one_workflow
 
+# ------------- AI PROXY
+
+podman run --network host -d us-central1-docker.pkg.dev/elastic-sa/tbekiares/aiassistant:o11y--course--field--demo-oneworkflow--main
+
+# ------------- LOAD WORKFLOWS
+
 get_ai_connector() {
     connectors=$(curl -X GET -s "$KIBANA_URL/api/actions/connectors" \
         -H "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
@@ -64,6 +70,13 @@ get_ai_connector() {
 }
 retry_command_lin get_ai_connector
 
-podman run --network host $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_connector $CONNECTOR_ID --ai_proxy http://kubernetes-vm:8080 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_workflows
+output=$(curl -s -X POST --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64"  -H 'Content-Type: application/json' "$ELASTICSEARCH_URL/_security/api_key" -d '
+{
+    "name": "workflow"
+}
+')
+ELASTICSEARCH_APIKEY=$(echo $output | jq -r '.encoded')
 
-podman run --network host $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_authbasic $ELASTICSEARCH_AUTH_BASE64 load_alerts
+podman run --network host $REPO/workflows:$INSTRUQT_TRACK_SLUG --ai_connector $CONNECTOR_ID --ai_proxy http://kubernetes-vm:8080 --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_apikey $ELASTICSEARCH_APIKEY load_workflows
+
+podman run --network host $REPO/workflows:$INSTRUQT_TRACK_SLUG --kibana_host $KIBANA_URL --es_host $ELASTICSEARCH_URL --es_apikey $ELASTICSEARCH_APIKEY load_alerts
